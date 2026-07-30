@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VECTRA — Verifikasi Produk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0a0a;
+    --surface: #141412;
+    --line: #2a2a26;
+    --lime: #c8ff00;
+    --lime-dim: #8fb300;
+    --text: #f4f4ef;
+    --muted: #8a8a82;
+    --danger: #ff4d3d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding: 24px;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(200,255,0,0.05), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(200,255,0,0.04), transparent 40%);
+  }
+  .card{
+    width:100%;
+    max-width:420px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 32px 28px 28px;
+    position:relative;
+    overflow:hidden;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.18em;
+    color: var(--lime);
+    text-transform:uppercase;
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:28px;
+  }
+  .stage{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    min-height: 220px;
+    justify-content:center;
+  }
+
+  /* --- Scanning state: radar ring --- */
+  .radar{
+    width:96px; height:96px;
+    border-radius:50%;
+    border: 1px solid var(--line);
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:20px;
+  }
+  .radar::before{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:50%;
+    border: 1px solid var(--lime);
+    opacity:0.5;
+    animation: pulse-ring 1.6s ease-out infinite;
+  }
+  .radar-dot{
+    width:10px; height:10px;
+    border-radius:50%;
+    background: var(--lime);
+    box-shadow: 0 0 12px var(--lime);
+  }
+  @keyframes pulse-ring{
+    0%{ transform:scale(0.8); opacity:0.6; }
+    100%{ transform:scale(1.8); opacity:0; }
+  }
+  .status-text{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color: var(--muted);
+    letter-spacing:0.04em;
+  }
+
+  /* --- Result state: seal stamp --- */
+  .seal{
+    width:104px; height:104px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:22px;
+    transform: scale(0.4) rotate(-14deg);
+    opacity:0;
+    animation: stamp 0.42s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  @keyframes stamp{
+    to{ transform: scale(1) rotate(0deg); opacity:1; }
+  }
+  .seal.ok{ border: 3px solid var(--lime); box-shadow: 0 0 0 6px rgba(200,255,0,0.08); }
+  .seal.fail{ border: 3px solid var(--danger); box-shadow: 0 0 0 6px rgba(255,77,61,0.08); }
+  .seal svg{ width:44px; height:44px; }
+
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  h1.ok{ color: var(--lime); }
+  h1.fail{ color: var(--danger); }
+
+  .sub{
+    font-size:13px;
+    color: var(--muted);
+    max-width:280px;
+    line-height:1.5;
+    margin-bottom:18px;
+  }
+
+  .details{
+    width:100%;
+    border-top: 1px solid var(--line);
+    padding-top:16px;
+    margin-top:6px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+  }
+  .details-row{
+    display:flex;
+    justify-content:space-between;
+    padding:5px 0;
+    color: var(--muted);
+  }
+  .details-row span:last-child{ color: var(--text); text-align:right; }
+
+  .flag{
+    margin-top:14px;
+    width:100%;
+    background: rgba(255,77,61,0.08);
+    border: 1px solid rgba(255,77,61,0.35);
+    color: var(--danger);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    line-height:1.5;
+    padding:10px 12px;
+    border-radius:2px;
+  }
+
+  .loc-prompt{
+    margin-top:22px;
+    width:100%;
+    display:flex;
+    gap:8px;
+  }
+  .loc-prompt button{
+    flex:1;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:10px 8px;
+    border-radius:2px;
+    cursor:pointer;
+    border:1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    transition: all .15s ease;
+  }
+  .loc-prompt button.primary{
+    background: var(--lime);
+    color:#0a0a0a;
+    border-color: var(--lime);
+    font-weight:600;
+  }
+  .loc-prompt button:hover{ opacity:0.85; }
+
+  .footer-note{
+    margin-top:20px;
+    font-size:10.5px;
+    color: #52524c;
+    text-align:center;
+    line-height:1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="eyebrow">
+    <span>VECTRA</span>
+    <span id="idLabel">—</span>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="radar"><div class="radar-dot"></div></div>
+    <div class="status-text">Menghubungi server verifikasi…</div>
+  </div>
+
+  <div class="footer-note">Data scan (waktu &amp; lokasi) dicatat untuk mendeteksi penyalahgunaan produk.</div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get('id');
+  const idLabel = document.getElementById('idLabel');
+  const stage = document.getElementById('stage');
+
+  idLabel.textContent = productId || 'NO-ID';
+
+  function renderNoId(){
+    stage.innerHTML = `
+      <div class="seal fail">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ff4d3d" stroke-width="2">
+          <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="fail">Tidak Ada ID</h1>
+      <div class="sub">Tautan ini tidak membawa ID produk yang valid. Pastikan Anda memindai tag NFC/QR resmi VECTRA.</div>
+    `;
+  }
+
+  function renderResult(data){
+    if(!data.authentic){
+      const reasonText = {
+        not_registered: 'ID produk ini tidak terdaftar di sistem kami. Produk kemungkinan besar tidak asli.',
+        revoked: 'Produk ini pernah terdaftar namun statusnya telah dicabut oleh VECTRA.',
+        recalled: 'Produk ini ditarik dari peredaran (recall). Hubungi tim VECTRA untuk info lebih lanjut.',
+      }[data.reason] || 'Produk tidak dapat diverifikasi.';
+
+      stage.innerHTML = `
+        <div class="seal fail">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#ff4d3d" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h1 class="fail">Produk Tidak Terdaftar</h1>
+        <div class="sub">${reasonText}</div>
+        <div class="details">
+          <div class="details-row"><span>ID</span><span>${productId}</span></div>
+          <div class="details-row"><span>Total scan ID ini</span><span>${data.scanCount}</span></div>
+        </div>
+      `;
+      return;
+    }
+
+    const p = data.product;
+    stage.innerHTML = `
+      <div class="seal ok">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="2.2">
+          <path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="ok">Produk Asli</h1>
+      <div class="sub">${p.name}</div>
+      <div class="details">
+        <div class="details-row"><span>ID</span><span>${p.id}</span></div>
+        <div class="details-row"><span>SKU</span><span>${p.sku || '—'}</span></div>
+        <div class="details-row"><span>Batch</span><span>${p.batch || '—'}</span></div>
+        <div class="details-row"><span>Ukuran</span><span>${p.size || '—'}</span></div>
+        <div class="details-row"><span>Terdaftar</span><span>${p.registeredAt}</span></div>
+        <div class="details-row"><span>Total scan</span><span>${data.scanCount}</span></div>
+      </div>
+      ${data.suspicious ? `<div class="flag">⚠ AKTIVITAS MENCURIGAKAN<br>${data.flagReason}</div>` : ''}
+    `;
+  }
+
+  function renderError(){
+    stage.innerHTML = `
+      <div class="seal fail">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ff4d3d" stroke-width="2">
+          <path d="M12 9v4M12 17h.01" stroke-linecap="round"/>
+          <circle cx="12" cy="12" r="9"/>
+        </svg>
+      </div>
+      <h1 class="fail">Gagal Terhubung</h1>
+      <div class="sub">Tidak bisa menghubungi server verifikasi. Periksa koneksi internet Anda dan coba lagi.</div>
+    `;
+  }
+
+  async function verify(lat, lng){
+    try{
+      const qs = new URLSearchParams({ id: productId });
+      if(lat !== undefined && lng !== undefined){ qs.set('lat', lat); qs.set('lng', lng); }
+      const res = await fetch('/api/verify?' + qs.toString());
+      const data = await res.json();
+      if(!data.ok) return renderError();
+      renderResult(data);
+    }catch(e){
+      renderError();
+    }
+  }
+
+  function askLocationThenVerify(){
+    stage.innerHTML = `
+      <div class="radar"><div class="radar-dot"></div></div>
+      <div class="status-text">Verifikasi ID produk…</div>
+      <div class="loc-prompt">
+        <button class="primary" id="allowLoc">Izinkan Lokasi</button>
+        <button id="skipLoc">Lewati</button>
+      </div>
+    `;
+    document.getElementById('allowLoc').onclick = () => {
+      stage.querySelector('.status-text').textContent = 'Meminta izin lokasi…';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => verify(pos.coords.latitude, pos.coords.longitude),
+        () => verify()
+      );
+    };
+    document.getElementById('skipLoc').onclick = () => verify();
+  }
+
+  if(!productId){
+    renderNoId();
+  } else {
+    setTimeout(askLocationThenVerify, 500);
+  }
+</script>
+
+</body>
+</html>

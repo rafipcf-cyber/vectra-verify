@@ -115,6 +115,30 @@
       "user_agent": "curl/8.21.0",
       "is_suspicious": 0,
       "flag_reason": null
+    },
+    {
+      "id": "1785482983180-qrkzcp0k",
+      "product_id": "ABC123XYZ",
+      "scanned_at": "2026-07-31T07:29:43.185Z",
+      "lat": null,
+      "lng": null,
+      "city": null,
+      "ip_address": "::ffff:127.0.0.1",
+      "user_agent": null,
+      "is_suspicious": 0,
+      "flag_reason": null
+    },
+    {
+      "id": "1785483046022-bmy5y7sj",
+      "product_id": "ABC123XYZ",
+      "scanned_at": "2026-07-31T07:30:46.022Z",
+      "lat": null,
+      "lng": null,
+      "city": null,
+      "ip_address": "::ffff:127.0.0.1",
+      "user_agent": null,
+      "is_suspicious": 0,
+      "flag_reason": null
     }
   ]
 }

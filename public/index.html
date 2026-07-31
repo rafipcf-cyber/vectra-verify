@@ -280,7 +280,7 @@
     `;
   }
 
-  function renderError(){
+  function renderError(message = 'Tidak bisa menghubungi server verifikasi. Periksa koneksi internet Anda dan coba lagi.'){
     stage.innerHTML = `
       <div class="seal fail">
         <svg viewBox="0 0 24 24" fill="none" stroke="#ff4d3d" stroke-width="2">
@@ -289,20 +289,40 @@
         </svg>
       </div>
       <h1 class="fail">Gagal Terhubung</h1>
-      <div class="sub">Tidak bisa menghubungi server verifikasi. Periksa koneksi internet Anda dan coba lagi.</div>
+      <div class="sub">${message}</div>
     `;
+  }
+
+  function getApiUrl(){
+    try {
+      return new URL('api/verify', window.location.href).toString();
+    } catch (error) {
+      return `${window.location.origin}/api/verify`;
+    }
   }
 
   async function verify(lat, lng){
     try{
       const qs = new URLSearchParams({ id: productId });
       if(lat !== undefined && lng !== undefined){ qs.set('lat', lat); qs.set('lng', lng); }
-      const res = await fetch('/api/verify?' + qs.toString());
-      const data = await res.json();
-      if(!data.ok) return renderError();
+      const res = await fetch(`${getApiUrl()}?${qs.toString()}`);
+      const text = await res.text();
+      let data = null;
+
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch (error) {
+        data = null;
+      }
+
+      if(!res.ok || !data || !data.ok){
+        const message = data?.message || data?.error || 'Server verifikasi mengembalikan respons yang tidak valid.';
+        return renderError(message);
+      }
+
       renderResult(data);
     }catch(e){
-      renderError();
+      renderError(e.message || 'Tidak bisa menghubungi server verifikasi.');
     }
   }
 

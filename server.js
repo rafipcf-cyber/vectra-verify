@@ -9,10 +9,11 @@ const express = require("express");
 
 const app = express();
 app.disable("x-powered-by");
+app.set("trust proxy", true);
 const PORT = process.env.PORT || 3000;
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
 const DB_DIR = path.join(__dirname, "db");
-const DB_FILE = process.env.DATABASE_PATH || path.join(DB_DIR, "vectra.json");
+const DB_FILE = process.env.DATABASE_PATH || (process.env.VERCEL ? "/tmp/vectra.json" : path.join(DB_DIR, "vectra.json"));
 
 if (!ADMIN_API_KEY) {
   console.warn("WARNING: ADMIN_API_KEY tidak diset. Endpoint admin akan memblokir akses sampai Anda menambahkan kunci.");
@@ -30,7 +31,16 @@ if (!fs.existsSync(DB_DIR)) {
 
 let dbData = { products: [], scans: [] };
 function saveDb() {
-  fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2), "utf8");
+  try {
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
+    fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2), "utf8");
+    return true;
+  } catch (error) {
+    console.warn("Gagal menulis database, tetap memakai memori sementara:", error.message);
+    return false;
+  }
 }
 
 function loadDb() {
@@ -52,7 +62,7 @@ function loadDb() {
     dbData.products = defaultProducts;
     dbData.scans = [];
     saveDb();
-    console.log(`Database prototype dibuat di ${DB_FILE} dengan ${defaultProducts.length} produk contoh.`);
+    console.log(`Database prototype siap dipakai di ${DB_FILE} dengan ${defaultProducts.length} produk contoh.`);
   }
 }
 
@@ -100,94 +110,113 @@ function getScansByProduct(id) {
 
 // URL yang ditulis di dalam NFC/QR: https://domainmu.com/verify?id=ABC123XYZ
 // atau https://domainmu.com/verify/ABC123XYZ / https://domainmu.com/ABC123XYZ
-app.get(["/verify", "/verify/:id"], (req, res) => {
+app.get(["/verify"], (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.get(["/:id"], (req, res) => {
+app.get(["/verify/:id"], (req, res) => {
   const requestedId = req.params.id;
   if (!requestedId || requestedId === "api" || requestedId === "verify") {
     return res.status(404).send("Not found");
   }
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+
+  return res.redirect(302, `/verify?id=${encodeURIComponent(requestedId)}`);
+});
+
+app.get(["/:id"], (req, res) => {
+  const requestedId = req.params.id;
+  if (!requestedId || requestedId === "api" || requestedId === "verify" || requestedId === "health") {
+    return res.status(404).send("Not found");
+  }
+
+  return res.redirect(302, `/verify?id=${encodeURIComponent(requestedId)}`);
 });
 
 app.get(["/api/verify", "/api/verify/:id"], (req, res) => {
-  const id = req.params.id || req.query.id;
-  const { lat, lng } = req.query;
+  try {
+    const id = req.params.id || req.query.id;
+    const { lat, lng } = req.query;
 
-  if (!id) {
-    return res.status(400).json({ ok: false, error: "ID produk tidak ada." });
-  }
-
-  const product = getProduct(id);
-  const lastScan = getLastScan(id);
-
-  let isSuspicious = 0;
-  let flagReason = null;
-
-  const hasLoc = lat !== undefined && lng !== undefined && lat !== "" && lng !== "";
-  const latNum = hasLoc ? parseFloat(lat) : null;
-  const lngNum = hasLoc ? parseFloat(lng) : null;
-
-  if (product && lastScan && hasLoc && lastScan.lat !== null && lastScan.lng !== null) {
-    const distanceKm = haversineKm(lastScan.lat, lastScan.lng, latNum, lngNum);
-    const minutesElapsed = (Date.now() - new Date(lastScan.scanned_at).getTime()) / 60000;
-    const hoursElapsed = Math.max(minutesElapsed / 60, 1 / 60);
-    const impliedSpeed = distanceKm / hoursElapsed;
-
-    if (distanceKm > 30 && impliedSpeed > MAX_PLAUSIBLE_SPEED_KMH) {
-      isSuspicious = 1;
-      flagReason = `Jarak ${distanceKm.toFixed(0)} km dari scan sebelumnya, hanya berselang ${minutesElapsed.toFixed(0)} menit (mustahil ditempuh manusia).`;
+    if (!id) {
+      return res.status(400).json({ ok: false, error: "ID produk tidak ada." });
     }
-  }
 
-  const scan = {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
-    product_id: id,
-    scanned_at: new Date().toISOString(),
-    lat: latNum,
-    lng: lngNum,
-    city: null,
-    ip_address: req.ip,
-    user_agent: req.get("user-agent") || null,
-    is_suspicious: isSuspicious,
-    flag_reason: flagReason,
-  };
+    const product = getProduct(id);
+    const lastScan = getLastScan(id);
 
-  addScan(scan);
+    let isSuspicious = 0;
+    let flagReason = null;
 
-  const scanCount = getScanCount(id);
+    const hasLoc = lat !== undefined && lng !== undefined && lat !== "" && lng !== "";
+    const latNum = hasLoc ? parseFloat(lat) : null;
+    const lngNum = hasLoc ? parseFloat(lng) : null;
 
-  if (!product) {
-    return res.json({ ok: true, authentic: false, reason: "not_registered", scanCount });
-  }
+    if (product && lastScan && hasLoc && lastScan.lat !== null && lastScan.lng !== null) {
+      const distanceKm = haversineKm(lastScan.lat, lastScan.lng, latNum, lngNum);
+      const minutesElapsed = (Date.now() - new Date(lastScan.scanned_at).getTime()) / 60000;
+      const hoursElapsed = Math.max(minutesElapsed / 60, 1 / 60);
+      const impliedSpeed = distanceKm / hoursElapsed;
 
-  if (product.status !== "active") {
+      if (distanceKm > 30 && impliedSpeed > MAX_PLAUSIBLE_SPEED_KMH) {
+        isSuspicious = 1;
+        flagReason = `Jarak ${distanceKm.toFixed(0)} km dari scan sebelumnya, hanya berselang ${minutesElapsed.toFixed(0)} menit (mustahil ditempuh manusia).`;
+      }
+    }
+
+    const scan = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+      product_id: id,
+      scanned_at: new Date().toISOString(),
+      lat: latNum,
+      lng: lngNum,
+      city: null,
+      ip_address: req.ip,
+      user_agent: req.get("user-agent") || null,
+      is_suspicious: isSuspicious,
+      flag_reason: flagReason,
+    };
+
+    addScan(scan);
+
+    const scanCount = getScanCount(id);
+
+    if (!product) {
+      return res.json({ ok: true, authentic: false, reason: "not_registered", scanCount });
+    }
+
+    if (product.status !== "active") {
+      return res.json({
+        ok: true,
+        authentic: false,
+        reason: product.status,
+        product: { name: product.name, sku: product.sku },
+        scanCount,
+      });
+    }
+
     return res.json({
       ok: true,
-      authentic: false,
-      reason: product.status,
-      product: { name: product.name, sku: product.sku },
+      authentic: true,
+      product: {
+        id: product.id,
+        name: product.name,
+        sku: product.sku,
+        batch: product.batch,
+        size: product.size,
+        registeredAt: product.registered_at,
+      },
       scanCount,
+      suspicious: !!isSuspicious,
+      flagReason,
+    });
+  } catch (error) {
+    console.error("API verify error:", error);
+    return res.status(500).json({
+      ok: false,
+      error: "internal_error",
+      message: "Gagal memproses verifikasi. Silakan coba lagi beberapa saat.",
     });
   }
-
-  return res.json({
-    ok: true,
-    authentic: true,
-    product: {
-      id: product.id,
-      name: product.name,
-      sku: product.sku,
-      batch: product.batch,
-      size: product.size,
-      registeredAt: product.registered_at,
-    },
-    scanCount,
-    suspicious: !!isSuspicious,
-    flagReason,
-  });
 });
 
 app.get("/api/products/:id/scans", (req, res) => {

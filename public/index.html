@@ -213,7 +213,11 @@
 
 <script>
   const params = new URLSearchParams(window.location.search);
-  const productId = params.get('id');
+  const pathSegments = window.location.pathname.split('/').filter(Boolean);
+  const pathId = pathSegments.length > 1 && pathSegments[0] === 'verify'
+    ? pathSegments[1]
+    : (pathSegments.length > 0 && pathSegments[0] !== 'api' ? pathSegments[0] : null);
+  const productId = params.get('id') || pathId;
   const idLabel = document.getElementById('idLabel');
   const stage = document.getElementById('stage');
 

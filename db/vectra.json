@@ -103,6 +103,18 @@
       "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
       "is_suspicious": 0,
       "flag_reason": null
+    },
+    {
+      "id": "1785454381363-4xqpd6jr",
+      "product_id": "ABC123XYZ",
+      "scanned_at": "2026-07-30T23:33:01.363Z",
+      "lat": null,
+      "lng": null,
+      "city": null,
+      "ip_address": "::1",
+      "user_agent": "curl/8.21.0",
+      "is_suspicious": 0,
+      "flag_reason": null
     }
   ]
 }

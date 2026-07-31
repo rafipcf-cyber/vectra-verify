@@ -8,19 +8,19 @@ const DB_FILE = path.join(__dirname, "vectra.json");
 const products = [
   {
     id: "ABC123XYZ",
-    name: "VECTRA Hoodie Onyx",
+    name: "VECTRA Kaos Biru",
     sku: "VEC-HD-001",
     batch: "B2026-01",
-    size: "L",
+    size: "S",
     status: "active",
     registered_at: new Date().toISOString(),
   },
   {
     id: "VEC-0002-TEE",
-    name: "VECTRA Tee Lime Edge",
+    name: "VECTRA Kaos Putih",
     sku: "VEC-TE-002",
     batch: "B2026-01",
-    size: "M",
+    size: "XL",
     status: "active",
     registered_at: new Date().toISOString(),
   },

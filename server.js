@@ -99,12 +99,22 @@ function getScansByProduct(id) {
 }
 
 // URL yang ditulis di dalam NFC/QR: https://domainmu.com/verify?id=ABC123XYZ
-app.get("/verify", (req, res) => {
+// atau https://domainmu.com/verify/ABC123XYZ / https://domainmu.com/ABC123XYZ
+app.get(["/verify", "/verify/:id"], (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.get("/api/verify", (req, res) => {
-  const { id, lat, lng } = req.query;
+app.get(["/:id"], (req, res) => {
+  const requestedId = req.params.id;
+  if (!requestedId || requestedId === "api" || requestedId === "verify") {
+    return res.status(404).send("Not found");
+  }
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.get(["/api/verify", "/api/verify/:id"], (req, res) => {
+  const id = req.params.id || req.query.id;
+  const { lat, lng } = req.query;
 
   if (!id) {
     return res.status(400).json({ ok: false, error: "ID produk tidak ada." });
@@ -189,6 +199,10 @@ app.get("/api/products/:id/scans", (req, res) => {
   res.json({ ok: true, scans: rows });
 });
 
-app.listen(PORT, () => {
-  console.log(`VECTRA verify server jalan di http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`VECTRA verify server jalan di http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

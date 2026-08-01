@@ -7,7 +7,7 @@ const path = require("path");
 const DB_FILE = path.join(__dirname, "vectra.json");
 const products = [
   {
-    id: "ABC123XYZ",
+    id: "VEC-0001-BDG",
     name: "VECTRA Kaos Biru",
     sku: "VEC-HD-001",
     batch: "B2026-01",

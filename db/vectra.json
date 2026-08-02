@@ -1,144 +1,23 @@
 {
   "products": [
     {
-      "id": "ABC123XYZ",
-      "name": "VECTRA Hoodie Onyx",
+      "id": "VEC-0001-BDG",
+      "name": "VECTRA Kaos Biru",
       "sku": "VEC-HD-001",
       "batch": "B2026-01",
-      "size": "L",
+      "size": "S",
       "status": "active",
-      "registered_at": "2026-07-30T21:58:43.636Z"
+      "registered_at": "2026-08-02T00:18:47.925Z"
     },
     {
       "id": "VEC-0002-TEE",
-      "name": "VECTRA Tee Lime Edge",
+      "name": "VECTRA Kaos Putih",
       "sku": "VEC-TE-002",
       "batch": "B2026-01",
-      "size": "M",
-      "status": "active",
-      "registered_at": "2026-07-30T21:58:43.637Z"
-    },
-    {
-      "id": "VEC-0003-JKT",
-      "name": "VECTRA Jacket Infinity",
-      "sku": "VEC-JK-003",
-      "batch": "B2026-02",
       "size": "XL",
-      "status": "revoked",
-      "registered_at": "2026-07-30T21:58:43.637Z"
-    },
-    {
-      "id": "VEC-0004-SNK",
-      "name": "VECTRA Sneakers Neon",
-      "sku": "VEC-SN-004",
-      "batch": "B2026-03",
-      "size": "42",
       "status": "active",
-      "registered_at": "2026-07-31T00:00:00.000Z"
-    },
-    {
-      "id": "VEC-0005-BAG",
-      "name": "VECTRA Sling Bag Photon",
-      "sku": "VEC-BG-005",
-      "batch": "B2026-03",
-      "size": "One Size",
-      "status": "recalled",
-      "registered_at": "2026-07-31T00:00:00.000Z"
-    },
-    {
-      "id": "VEC-0006-HAT",
-      "name": "VECTRA Cap Eclipse",
-      "sku": "VEC-HT-006",
-      "batch": "B2026-04",
-      "size": "Adjustable",
-      "status": "active",
-      "registered_at": "2026-07-31T00:00:00.000Z"
+      "registered_at": "2026-08-02T00:18:47.939Z"
     }
   ],
-  "scans": [
-    {
-      "id": "1785449016458-alswf3oq",
-      "product_id": "ABC123XYZ",
-      "scanned_at": "2026-07-30T22:03:36.458Z",
-      "lat": -6.852644000000001,
-      "lng": 107.508683,
-      "city": null,
-      "ip_address": "::1",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-      "is_suspicious": 0,
-      "flag_reason": null
-    },
-    {
-      "id": "1785449044219-98d1h0kq",
-      "product_id": "VEC-0003-JKT",
-      "scanned_at": "2026-07-30T22:04:04.219Z",
-      "lat": -6.852644000000001,
-      "lng": 107.508683,
-      "city": null,
-      "ip_address": "::1",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-      "is_suspicious": 0,
-      "flag_reason": null
-    },
-    {
-      "id": "1785449547017-9bqy8a4z",
-      "product_id": "ABC123XYZ",
-      "scanned_at": "2026-07-30T22:12:27.017Z",
-      "lat": null,
-      "lng": null,
-      "city": null,
-      "ip_address": "::1",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.130.0 Chrome/148.0.7778.280 Electron/42.6.0 Safari/537.36",
-      "is_suspicious": 0,
-      "flag_reason": null
-    },
-    {
-      "id": "1785450011672-13rjj1kt",
-      "product_id": "ABC123XYZ",
-      "scanned_at": "2026-07-30T22:20:11.672Z",
-      "lat": null,
-      "lng": null,
-      "city": null,
-      "ip_address": "::1",
-      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
-      "is_suspicious": 0,
-      "flag_reason": null
-    },
-    {
-      "id": "1785454381363-4xqpd6jr",
-      "product_id": "ABC123XYZ",
-      "scanned_at": "2026-07-30T23:33:01.363Z",
-      "lat": null,
-      "lng": null,
-      "city": null,
-      "ip_address": "::1",
-      "user_agent": "curl/8.21.0",
-      "is_suspicious": 0,
-      "flag_reason": null
-    },
-    {
-      "id": "1785482983180-qrkzcp0k",
-      "product_id": "ABC123XYZ",
-      "scanned_at": "2026-07-31T07:29:43.185Z",
-      "lat": null,
-      "lng": null,
-      "city": null,
-      "ip_address": "::ffff:127.0.0.1",
-      "user_agent": null,
-      "is_suspicious": 0,
-      "flag_reason": null
-    },
-    {
-      "id": "1785483046022-bmy5y7sj",
-      "product_id": "ABC123XYZ",
-      "scanned_at": "2026-07-31T07:30:46.022Z",
-      "lat": null,
-      "lng": null,
-      "city": null,
-      "ip_address": "::ffff:127.0.0.1",
-      "user_agent": null,
-      "is_suspicious": 0,
-      "flag_reason": null
-    }
-  ]
+  "scans": []
 }

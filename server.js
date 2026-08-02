@@ -20,9 +20,8 @@ if (!ADMIN_API_KEY) {
 }
 
 const defaultProducts = [
-  { id: "ABC123XYZ", name: "VECTRA Hoodie Onyx", sku: "VEC-HD-001", batch: "B2026-01", size: "L", status: "active", registered_at: new Date().toISOString() },
-  { id: "VEC-0002-TEE", name: "VECTRA Tee Lime Edge", sku: "VEC-TE-002", batch: "B2026-01", size: "M", status: "active", registered_at: new Date().toISOString() },
-  { id: "VEC-0003-JKT", name: "VECTRA Jacket Infinity", sku: "VEC-JK-003", batch: "B2026-02", size: "XL", status: "revoked", registered_at: new Date().toISOString() },
+  { id: "VEC-0001-BDG", name: "VECTRA Kaos Biru", sku: "VEC-HD-001", batch: "B2026-01", size: "S", status: "active", registered_at: new Date().toISOString() },
+  { id: "VEC-0002-TEE", name: "VECTRA Kaos Putih", sku: "VEC-TE-002", batch: "B2026-01", size: "XL", status: "active", registered_at: new Date().toISOString() },
 ];
 
 if (!fs.existsSync(DB_DIR)) {
